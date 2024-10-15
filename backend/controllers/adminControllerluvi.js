@@ -44,10 +44,15 @@ const getUserProfile = async (req, res) => {
     try {
       // After authentication, req.user will contain the user's information
       const userName = req.user.name;
-  
+      const userId = req.user.id;
+      const userType = req.user.userType;
+      const userEmail = req.user.email;
       res.json({
         message: 'User profile data',
-        userName: userName, // You can access the logged-in user's name here
+        userName:userName, // You can access the logged-in user's name here
+        userId:userId,
+        userType:userType,
+        userEmail:userEmail,
       });
     } catch (error) {
       res.status(500).json({ message: 'Error fetching user profile', error: error.message });

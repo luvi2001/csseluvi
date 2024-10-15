@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllResidents,getResident, requestNewBin,getUserBins , reportWasteIssue, makePayment , getPendingPaymentsForUser,createGarbageCollectionRequest,getResidentDetails,} = require('../controllers/residentController');
+const { getAllResidents,getResident,getResidentDetailsWithUserId, requestNewBin,getUserBins , reportWasteIssue, makePayment , getPendingPaymentsForUser,createGarbageCollectionRequest,getResidentDetails,} = require('../controllers/residentController');
 const { getNotifications } = require('../controllers/notificationsController');
 const authMiddleware=require('../middleware/authMiddleware')
 
@@ -9,6 +9,8 @@ router.get('/getResident/:id', getResident);
 
 router.get('/getAllResidents', getAllResidents);
 
+
+router.get('/getResidentUserId/:id', getResidentDetailsWithUserId);
 // Request a new bin as a resident
 router.post('/requestBin/:id', requestNewBin);
 
@@ -27,6 +29,7 @@ router.get('/:id/notifications', getNotifications);
 router.get('/:id/payments/pending',getPendingPaymentsForUser);
 
 router.post('/create-request', createGarbageCollectionRequest);
+
 router.get('/details', authMiddleware, getResidentDetails);
 
 module.exports = router;

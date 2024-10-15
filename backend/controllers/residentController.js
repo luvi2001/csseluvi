@@ -50,13 +50,24 @@ const requestNewBin = async (req, res) => {
 
 const getUserBins = async (req, res) => {
   try {
+    console.log(`Inside getUserBins in residentController`);
+
     // Find the bins associated with the residentId passed in the URL params
     const bins = await Bin.find({ residentId: req.params.id });
-    res.json(bins); // Send the bins data back as JSON
+
+    // Check if no bins are found (empty array)
+    if (bins.length === 0) {
+      return res.status(404).json({ message: "No bins available" });
+    }
+
+    // Return the bins if found
+    res.status(200).json(bins); // Send the bins data back as JSON
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message }); // Handle any errors during the database query
   }
 };
+
 
 const reportWasteIssue = async (req, res) => {
   const { description } = req.body;
@@ -71,32 +82,40 @@ const reportWasteIssue = async (req, res) => {
 };
 
 const makePayment = async (req, res) => {
-  const { amount, cardNumber, expiryDate, cvc, billingAddress, saveCardDetails, binType } = req.body;
-  const payment = new Payment({ residentId: req.params.id, amount });
+  console.log("Payment route hit"); // Add this log at the top
+  console.log(`Request Body: ${JSON.stringify(req.body)}`);
+
+  const { residentId, amount, cardNumber, expirationDate, cvc, billingAddress, saveCardDetails, binType } = req.body;
+
+  console.log(`In PaymentController: makePayment: ${residentId}, ${amount}, ${cardNumber}, ${expirationDate}, ${cvc}, ${billingAddress}, ${saveCardDetails}, ${binType}`);
 
   try {
     // Save the payment to the Payment collection
+    const payment = new Payment({ residentId, amount });
     const newPayment = await payment.save();
 
     // If the user wants to save their card details, update the Resident schema
     if (saveCardDetails) {
+      // Check if the paymentDetails exists, if not, initialize it with an empty object
       await Resident.findOneAndUpdate(
-        { userId: req.params.id }, // Find the resident by userId
+        { _id: residentId },
         {
           $set: {
-            "paymentDetails.cardNumber": cardNumber,
-            "paymentDetails.expiryDate": expiryDate,
-            "paymentDetails.cvc": cvc,
-            "paymentDetails.billingAddress": billingAddress,
+            "paymentDetails": {
+              cardNumber,
+              expiryDate: expirationDate,
+              cvc,
+              billingAddress
+            }
           }
         },
-        { new: true }
+        { new: true, upsert: true } // `upsert: true` will create the field if it doesn't exist
       );
     }
 
     // After successful payment, create a new bin request with default status "Pending"
     const binRequest = new BinRequest({
-      residentId: req.params.id, // Link the bin request to the resident
+      residentId, // Link the bin request to the resident
       binType, // Store the bin type passed in the request
       status: 'Pending' // Default status as "Pending"
     });
@@ -104,13 +123,17 @@ const makePayment = async (req, res) => {
     const newBinRequest = await binRequest.save(); // Save the bin request to the database
 
     // Send a notification to the resident about the payment and the bin request
-    await createNotification(req.params.id, `Your payment of $${amount} has been successfully made and your request for a ${binType} bin is pending.`);
+    await createNotification(residentId, `Your payment of $${amount} has been successfully made and your request for a ${binType} bin is pending.`);
 
     res.status(201).json({ payment: newPayment, binRequest: newBinRequest });
+
+    navigation.navigate
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
+
 
 // Get pending payments for a specific resident (user)
 const getPendingPaymentsForUser = async (req, res) => {
@@ -130,8 +153,6 @@ const getPendingPaymentsForUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 
 const createGarbageCollectionRequest = async (req, res) => {
@@ -154,9 +175,11 @@ const createGarbageCollectionRequest = async (req, res) => {
 
 const getResidentDetails = async (req, res) => {
   try {
+    console.log(`In residentController:getResidentDetails(Luvi):${req.userId}`);
+    
     // Fetch resident details using the userId (from token)
-    const resident = await Resident.findOne({ userId: req.user.id })
-      .populate('userId', 'name email')  // Populate User fields (name, email)
+    const resident = await Resident.findOne({ userId: req.userId })
+      .populate('userId', 'name email')  // Populate the user fields (name, email)
       .exec();
 
     if (!resident) {
@@ -165,16 +188,51 @@ const getResidentDetails = async (req, res) => {
 
     // Return resident details including name, email, and address
     res.status(200).json({
-      residentId: resident.userId._id,
-      residentName: resident.userId.name,
-      residentEmail: resident.userId.email,
-      address: resident.address,
+      residentId: resident._id,
+      residentName: resident.userId.name, // Access user's name
+      residentEmail: resident.userId.email, // Access user's email
+      address: resident.address, // Resident-specific data
     });
   } catch (error) {
     console.error('Error fetching resident details:', error);
     res.status(500).json({ message: 'Failed to fetch resident details' });
   }
 };
+
+const getResidentDetailsWithUserId = async (req, res) => {
+  console.log(`Inside resident controller: get res with uid`);
+  try {
+    // Get the userId from the request parameters
+    const  userId  = req.params.id;
+    console.log(`Inside get res with uid:${userId}`);
+    
+    // Fetch resident details using the userId passed in the request
+    const resident = await Resident.findOne({ userId })
+      .populate('userId', 'name email')  // Populate the user fields (name, email)
+      .exec();
+
+    if (!resident) {
+      return res.status(404).json({ message: 'Resident not found' });
+    }
+    console.log(`residentId: ${resident._id},
+        address: ${resident.address},residentName: ${resident.userId.name},residentEmail: ${resident.userId.email} `);
+    // residentName: resident.userId.name, 
+      // residentEmail: resident.userId.email, 
+    // Return resident details including name, email, and address
+    res.status(200).json({
+      residentId: resident._id,
+      residentName: resident.userId.name,
+      residentEmail: resident.userId.email,
+      address: resident.address, // Resident-specific data
+    });
+  } catch (error) {
+    console.error('Error fetching resident details:', error);
+    res.status(500).json({ message: 'Failed to fetch resident details' });
+  }
+};
+
+
+
 
 module.exports = {
   getUserBins,
@@ -185,5 +243,6 @@ module.exports = {
   getPendingPaymentsForUser,
   getAllResidents,
   createGarbageCollectionRequest,
-  getResidentDetails
+  getResidentDetails,
+  getResidentDetailsWithUserId
 };

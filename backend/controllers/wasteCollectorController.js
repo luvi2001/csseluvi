@@ -1,5 +1,5 @@
 const WasteCollector = require('../models/wasteReportSchema');
-const Bin = require('../models/BinSchema');
+const Bin = require('./../models/wasteCollectorSchema');
 
 const getWasteCollector = async (req, res) => {
   try {

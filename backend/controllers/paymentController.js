@@ -11,19 +11,56 @@ const getPayment = async (req, res) => {
 };
 
 // Create a new payment
-const createPayment = async (req, res) => {
-  const { residentId, amount } = req.body;
-  const payment = new Payment({ residentId, amount });
+const makePayment = async (req, res) => {
+  console.log("Payment route hit");
+  console.log(`Request Body: ${JSON.stringify(req.body)}`);
+
+  const { residentId, amount, cardNumber, expirationDate, cvc, billingAddress, saveCardDetails, binType } = req.body;
+
+  console.log(`In PaymentController: makePayment: ${residentId}, ${amount}, ${cardNumber}, ${expirationDate}, ${cvc}, ${billingAddress}, ${saveCardDetails}, ${binType}`);
 
   try {
+    // Save the payment to the Payment collection
+    const payment = new Payment({ residentId, amount });
     const newPayment = await payment.save();
 
-    // Assuming createNotification is available to notify residents about the payment
-    await createNotification(residentId, `Your payment of $${amount} has been successfully made.`);
+    // If the user wants to save their card details, update the Resident schema
+    if (saveCardDetails) {
+      await Resident.findOneAndUpdate(
+        { _id: residentId },
+        {
+          $set: {
+            "paymentDetails": {
+              cardNumber,
+              expiryDate: expirationDate,
+              cvc,
+              billingAddress
+            }
+          }
+        },
+        { new: true, upsert: true } // Ensure the `paymentDetails` is updated or created
+      );
+    }
 
-    res.status(201).json(newPayment);
+    // After successful payment, create a new bin request with default status "Pending"
+    const binRequest = new BinRequest({
+      residentId, // Link the bin request to the resident
+      binType, // Store the bin type passed in the request
+      status: 'Pending' // Default status as "Pending"
+    });
+
+    const newBinRequest = await binRequest.save();
+
+    // Send a notification to the resident about the payment and the bin request
+    await createNotification(residentId, `Your payment of $${amount} has been successfully made and your request for a ${binType} bin is pending.`);
+
+    // Send the response after everything is successful
+    //return res.status(201).json({ payment: newPayment, binRequest: newBinRequest });
+    return res.status(201).json({ message: 'Payment and bin request processed successfully.' });
+
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Error in makePayment:", error);
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -51,7 +88,7 @@ const getPendingPayments = async (req, res) => {
 
 module.exports = {
   getPayment,
-  createPayment,
+  makePayment,
   getAllPayments,
   getPendingPayments,
 };

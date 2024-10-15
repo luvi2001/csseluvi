@@ -11,9 +11,16 @@ const residentSchema = new mongoose.Schema({
   },
   binRequests: [
     {
-      binType: { type: String, enum: ['Bio', 'Plastic', 'Glass'], required: true, default: null },
+      binType: { type: String, enum: ['Bio', 'Plastic', 'Glass','Bulky Item','Paper and Cardboard','Yard Waste','Food Scraps','Extra Trash'], required: true, default: null },
       status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
     }
+  ],
+  bins: [
+    {
+      binID:{ type: String, required: true},
+      binType:{ type: String, enum: ['Bio', 'Plastic', 'Glass'], required: true , default: null},
+      status: { type: String, enum: ['Active', 'Damaged', 'Full'], required: true , default: 'Active'}
+    }  
   ],
   wasteReports: [
     {
