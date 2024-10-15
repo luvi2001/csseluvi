@@ -112,34 +112,40 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1, // Ensures ScrollView expands properly
     padding: 20,
+    backgroundColor: '#cceba7', // Light green background for the screen
   },
   container: {
     flex: 1,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: '#333', // Darker color for the heading
   },
   requestCard: {
     marginBottom: 20,
     padding: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#ffffff', // White background for the card
     borderRadius: 10,
     elevation: 3,
   },
   text: {
     fontSize: 16,
     marginBottom: 10,
+    color: '#333', // Darker text for better readability
   },
   label: {
     fontWeight: 'bold',
+    color: '#555', // Soft color for labels
   },
   picker: {
     height: 50,
     width: '100%',
     marginBottom: 15,
+    backgroundColor: '#4CAF50', // Picker background same as button color
+    borderRadius: 5,
   },
   address: {
     color: 'blue', // Make the address text stand out as a link

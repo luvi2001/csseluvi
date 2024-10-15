@@ -95,7 +95,12 @@ const NewBinRequestScreen = ({ navigation }) => {
         </>
       )}
 
-      <Button title="Confirm Order" onPress={handleConfirmOrder} />
+      {/* Green button for confirming the order */}
+      <Button
+        title="Confirm Order"
+        onPress={handleConfirmOrder}
+        color="#4CAF50" // Green color
+      />
     </View>
   );
 };
@@ -105,7 +110,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#cceba7',
   },
   heading: {
     fontSize: 24,

@@ -72,7 +72,7 @@ const LoginScreen = ({ navigation }) => {
         secureTextEntry
       />
 
-      <Button title="Login" onPress={handleLogin} />
+      <Button style={styles.btn} title="Login" onPress={handleLogin} />
 
       {/* "Don't have an account?" link */}
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#cceba7',
   },
   heading: {
     fontSize: 24,
@@ -109,6 +109,9 @@ const styles = StyleSheet.create({
     color: '#0066cc',
     textDecorationLine: 'underline',
   },
+  btn:{
+    backgroundColor:'#4CAF50'
+  }
 });
 
 export default LoginScreen;

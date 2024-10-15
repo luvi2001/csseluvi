@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getBinRequests,getUserProfile,getGarbageRequests,updateGarbageRequest,getWasteCollectors } = require('../controllers/adminControllerluvi');
+const { getBinRequests,getUserProfile,getGarbageRequests,updateGarbageRequest,getWasteCollectors,createBin} = require('../controllers/adminControllerluvi');
 const authenticateUser = require("../middleware/authMiddleware");
 
 // Route to get all bin requests with resident details
@@ -13,5 +13,10 @@ router.put('/garbage-requests/:id', updateGarbageRequest);
 
 // Fetch all waste collectors
 router.get('/waste-collectors', getWasteCollectors);
+
+
+//create bin
+router.post('/bins', createBin);
+
 
 module.exports = router;

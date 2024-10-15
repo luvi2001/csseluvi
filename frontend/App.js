@@ -15,7 +15,6 @@ import profileScreen from './src/screens/profileScreen';
 // Home Screens
 import AdminHome from './src/screens/Admin/AdminHome';
 import DistributorHome from './src/screens/Distributor/DistributorHome';
-import ResidentHome from './src/screens/Resident/ResidentHome';
 import ServiceManagerHome from './src/screens/ServiceManager/ServiceManagerHome';
 import WasteCollectorHome from './src/screens/wasteCollector/WasteCollectorHome';
 
@@ -29,7 +28,10 @@ import PaymentScreen from './src/screens/Resident/PaymentScreen'
 import PaymentProcessingScreen from './src/screens/Resident/paymentProcessingScreen';
 import WasteReportScreen from './src/screens/Resident/WasteReportScreen'; // Import the screen
 import BinRequestsScreen from './src/screens/Admin/DisplayBinRequests';
-import GarbageCollectionRequestForm from './src/screens/Resident/GarbageCollectionRequestForm';
+
+import CreateBin from './src/screens/Admin/CreateBin';
+import BottomTabNavigator from './src/screens/Resident/BottonNavigator';
+import AdNavigator from './src/screens/Admin/AdNavigator';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -47,9 +49,9 @@ export default function App() {
           <Stack.Screen name="profileScreen" component={profileScreen} />
 
           {/* Home Screens */}
-          <Stack.Screen name="AdminHome" component={AdminHome} />
+          
           <Stack.Screen name="DistributorHome" component={DistributorHome} />
-          <Stack.Screen name="ResidentHome" component={ResidentHome} />
+          
           <Stack.Screen name="ServiceManagerHome" component={ServiceManagerHome} />
           <Stack.Screen name="WasteCollectorHome" component={WasteCollectorHome} />
 
@@ -65,9 +67,12 @@ export default function App() {
           <Stack.Screen name="WasteReportScreen" component={WasteReportScreen} />
 
 
-          <Stack.Screen name="AdminBinreq" component={BinRequestsScreen} />
-          <Stack.Screen name="Reqcol" component={GarbageCollectionRequestForm} />
+          <Stack.Screen name="AdminHome" component={AdNavigator} />
+          
 
+
+          <Stack.Screen name="ResidentHome" component={BottomTabNavigator} />
+          <Stack.Screen name="CreateBinScreen" component={CreateBin} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

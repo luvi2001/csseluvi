@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#cceba7',
   },
   heading: {
     fontSize: 24,
