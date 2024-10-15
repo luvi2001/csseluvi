@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -92,11 +92,10 @@ const GarbageCollectionRequestForm = () => {
         editable={false}
       />
 
-      {/* Location Input (For Garbage Collection) */}
-
-
       {/* Submit Button */}
-      <Button title="Send Request" onPress={handleRequest} />
+      <TouchableOpacity style={styles.button} onPress={handleRequest}>
+        <Text style={styles.buttonText}>Send Request</Text>
+      </TouchableOpacity>
 
       {/* Message */}
       {message ? <Text style={styles.message}>{message}</Text> : null}
@@ -106,22 +105,43 @@ const GarbageCollectionRequestForm = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
+    backgroundColor: '#cceba7',  // Light background color for better contrast
   },
   header: {
-    fontSize: 24,
-    marginBottom: 20,
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 30,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderBottomWidth: 1,
-    marginBottom: 20,
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 15,
     paddingLeft: 10,
+    backgroundColor: '#fff',  // White background for input fields
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   message: {
     marginTop: 20,
     fontSize: 16,
+    textAlign: 'center',
     color: 'green',
   },
 });

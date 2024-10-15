@@ -3,6 +3,9 @@ const Resident = require('../models/residentSchema');
 const jwt = require('jsonwebtoken');
 const GarbageCollectionRequest = require('../models/garbageCollectionRequestSchema');
 const User = require('../models/userSchema');
+const Bin= require('../models/BinnsModel');
+const QRCode = require('qrcode');
+
 
 // Controller to fetch bin requests with resident details
 const getBinRequests = async (req, res) => {
@@ -92,10 +95,36 @@ const getUserProfile = async (req, res) => {
     }
   };
 
+  const createBin = async (req, res) => {
+    const { binType, residentName, location } = req.body;
+  
+    try {
+      // Create a new bin instance without the QR code yet
+      const newBin = new Bin({ binType, residentName, location });
+  
+      // Generate QR code based on bin data
+      const binData = { binType, residentName, location };
+      const qrCodeUrl = await QRCode.toDataURL(JSON.stringify(binData)); // Convert bin data to QR code
+  
+      // Assign the generated QR code URL to the newBin instance
+      newBin.qrCode = qrCodeUrl;
+  
+      // Save the new bin with the QR code to the database
+      const savedBin = await newBin.save();
+  
+      // Return the saved bin in the response
+      res.status(201).json(savedBin);
+    } catch (err) {
+      console.error('Error creating bin:', err);
+      res.status(500).json({ error: 'Failed to create bin' });
+    }
+  };
+
 module.exports = {
   getBinRequests,
   getUserProfile,
   getWasteCollectors,
   updateGarbageRequest,
-  getGarbageRequests
+  getGarbageRequests,
+  createBin
 };
